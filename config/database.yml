@@ -1,0 +1,21 @@
+default: &default  
+  adapter: postgresql  
+  encoding: unicode  
+  pool: 5  
+  username: root  
+  password: 123456  
+  host: localhost  
+
+development:  
+  <<: *default  
+  database: place  
+
+test:  
+  <<: *default  
+  database: your_app_test  
+
+production:  
+  <<: *default  
+  database: your_app_production  
+  username: your_production_username  
+  password: <%= ENV['YOUR_DATABASE_PASSWORD'] %>

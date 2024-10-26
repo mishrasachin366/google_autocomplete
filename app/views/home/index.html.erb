@@ -1,0 +1,80 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+  <title>State Autocomplete Example</title>  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>  
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQxCu-bKgWfIic4Mn3-Ed2fugFAQO8W6A&libraries=places"></script>  
+  <style>  
+    #suggestions {  
+      border: 1px solid #ccc;  
+      max-height: 150px;  
+      overflow-y: auto;  
+      display: none;  
+    }  
+    .suggestion {  
+      padding: 10px;  
+      cursor: pointer;  
+    }  
+    .suggestion:hover {  
+      background: #eee;  
+    }  
+  </style>  
+</head>  
+<body>  
+  <h1>State Autocomplete</h1>  
+  <input id="autocomplete" type="text" placeholder="Type a state..." autocomplete="off"/>  
+  <div id="suggestions"></div>  
+  
+  <script>  
+    $(document).ready(function() {  
+      const input = $('#autocomplete');  
+      const suggestionsDiv = $('#suggestions');  
+      const autocompleteService = new google.maps.places.AutocompleteService();  
+      
+      input.on('input', function() {  
+        const query = this.value;  
+
+        if (query.length === 0) {  
+          suggestionsDiv.empty().hide();  
+          return;  
+        }  
+
+        autocompleteService.getPlacePredictions(  
+          {   
+            input: query,   
+            types: ['(regions)'],  
+            componentRestrictions: { country: 'us' }  
+          },  
+          function(predictions, status) {  
+            if (status === google.maps.places.PlacesServiceStatus.OK) {  
+              suggestionsDiv.empty().show();  
+              
+              predictions.forEach(prediction => {  
+                const name = prediction.description;  
+                const shortName = name.split(',')[0]; // Get the first part for state name  
+
+                // Check if the name contains the country and remove it  
+                const formattedName = name.replace(/, USA$/, '').trim(); // Remove ', USA' if present  
+
+                // Display suggestion with name (and potentially state code)  
+                const suggestionDiv = $('<div class="suggestion"></div>').text(formattedName);  
+                suggestionDiv.on('click', function() {  
+                  input.val(formattedName);  
+                  suggestionsDiv.empty().hide();  
+                });  
+                suggestionsDiv.append(suggestionDiv);  
+              });  
+            } else {  
+              suggestionsDiv.empty().hide();  
+            }  
+          }  
+        );  
+      });  
+      
+      input.on('blur', function() {  
+        setTimeout(() => suggestionsDiv.hide(), 100);  
+      });  
+    });  
+  </script>  
+</body>  
+</html>
